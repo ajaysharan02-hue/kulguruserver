@@ -30,7 +30,7 @@ app.use(
 app.use(cookieParser()); // Parse cookies early
 app.use(cors({
     origin: (origin, callback) => {
-        const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:5173','http://localhost:3000','http://localhost:5177'];
+        const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:5173','http://localhost:3000','http://localhost:5177','https://kulguruadmin-production.up.railway.app'];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
