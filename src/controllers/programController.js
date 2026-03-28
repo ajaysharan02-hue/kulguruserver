@@ -9,10 +9,10 @@ const ErrorResponse = require('../utils/errorResponse');
  */
 exports.getPrograms = asyncHandler(async (req, res, next) => {
     const { page = 1, limit = 10, status, search } = req.query;
-
+    console.log("req.query",req.query);   
     // Build query
     let query = { deleted: false };
-
+   
     if (status) {
         query.status = status;
     }
@@ -31,7 +31,7 @@ exports.getPrograms = asyncHandler(async (req, res, next) => {
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .select('-__v');
-
+        
     const total = await Program.countDocuments(query);
 
     res.status(200).json({
@@ -72,7 +72,11 @@ exports.getProgram = asyncHandler(async (req, res, next) => {
  * @route   POST /api/programs
  * @access  Private/Admin
  */
-exports.createProgram = asyncHandler(async (req, res, next) => {
+exports.createProgram = asyncHandler(async (req, res) => {
+    if (req.file) {
+        req.body.imageUrl = `/uploads/programs/${req.file.filename}`;
+    }
+
     const program = await Program.create(req.body);
     
     res.status(201).json({
@@ -91,6 +95,10 @@ exports.updateProgram = asyncHandler(async (req, res, next) => {
 
     if (!program || program.deleted) {
         return next(new ErrorResponse('Program not found', 404));
+    }
+
+    if (req.file) {
+        req.body.imageUrl = `/uploads/programs/${req.file.filename}`;
     }
 
     program = await Program.findByIdAndUpdate(req.params.id, req.body, {

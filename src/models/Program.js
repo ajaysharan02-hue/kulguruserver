@@ -17,11 +17,14 @@ const ProgramSchema = new mongoose.Schema(
         },
         description: {
             type: String,
-        },    
+        },
+        imageUrl: {
+            type: String,
+        },
         duration: {
             type: String,
             required: [true, 'Program duration is required'],
-        }, 
+        },
         eligibility: {
             type: String,
         },
@@ -53,5 +56,15 @@ ProgramSchema.index({ deleted: 1 });
 // Ensure virtuals are included in JSON
 ProgramSchema.set('toJSON', { virtuals: true });
 ProgramSchema.set('toObject', { virtuals: true });
+
+// Absolute image URL for frontend/admin consumption
+ProgramSchema.virtual('image').get(function () {
+    if (!this.imageUrl) return null;
+    if (this.imageUrl.startsWith('http://') || this.imageUrl.startsWith('https://')) {
+        return this.imageUrl;
+    }
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+    return baseUrl + this.imageUrl;
+});
 
 module.exports = mongoose.model('Program', ProgramSchema);

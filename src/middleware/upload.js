@@ -20,11 +20,18 @@ if (!fs.existsSync(avatarsDir)) {
     fs.mkdirSync(avatarsDir, { recursive: true });
 }
 
+// Create programs subdirectory
+const programsDir = path.join(uploadDir, 'programs');
+if (!fs.existsSync(programsDir)) {
+    fs.mkdirSync(programsDir, { recursive: true });
+}
+
 // Storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const kind = req?.params?.kind || req?.body?.kind || 'banners';
         if (kind === 'avatar' || kind === 'avatars') return cb(null, avatarsDir);
+        if (kind === 'program' || kind === 'programs') return cb(null, programsDir);
         return cb(null, bannersDir);
     },
     filename: (req, file, cb) => {

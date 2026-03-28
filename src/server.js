@@ -84,6 +84,12 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Serve static files from uploads directory
+// Primary location is `backend/src/uploads` (used by current upload middleware).
+const uploadsCandidates = [
+    path.join(__dirname, 'uploads'),
+    path.join(__dirname, '..', 'uploads'),
+];
+
 app.use('/uploads', cors({
     origin: (origin, callback) => {
         const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:5173','http://localhost:3000','http://localhost:5177'];
@@ -96,7 +102,15 @@ app.use('/uploads', cors({
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-}), express.static(path.join(__dirname, 'uploads')));
+}), (req, res, next) => {
+    let i = 0;
+    const tryNext = () => {
+        if (i >= uploadsCandidates.length) return next();
+        const dir = uploadsCandidates[i++];
+        return express.static(dir)(req, res, tryNext);
+    };
+    return tryNext();
+});
 
 // API Routes (central mount)
 app.use('/api', require('./routes'));
