@@ -14,6 +14,12 @@ if (!fs.existsSync(bannersDir)) {
     fs.mkdirSync(bannersDir, { recursive: true });
 }
 
+// Create logos subdirectory
+const logosDir = path.join(uploadDir, 'logos');
+if (!fs.existsSync(logosDir)) {
+    fs.mkdirSync(logosDir, { recursive: true });
+}
+
 // Create avatars subdirectory
 const avatarsDir = path.join(uploadDir, 'avatars');
 if (!fs.existsSync(avatarsDir)) {
@@ -30,6 +36,7 @@ if (!fs.existsSync(programsDir)) {
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const kind = req?.params?.kind || req?.body?.kind || 'banners';
+        if (kind === 'logo' || kind === 'logos') return cb(null, logosDir);
         if (kind === 'avatar' || kind === 'avatars') return cb(null, avatarsDir);
         if (kind === 'program' || kind === 'programs') return cb(null, programsDir);
         return cb(null, bannersDir);
