@@ -156,6 +156,22 @@ const updateSettingValidation = [
     body('settings').isObject().withMessage('Settings must be an object'),
 ];
 
+// ----- Banner -----
+const createServicePatneValidation = [
+    body('name').notEmpty().trim().withMessage('Service Patne Name is required'),
+    body('imageUrl').optional().trim(),
+    body('description').optional().trim(),
+    body('status').optional().isIn(['active', 'inactive']).withMessage('Status must be active or inactive'),
+];
+
+const updateServicePatneValidation = [
+    param('id').isMongoId().withMessage('Invalid banner ID'),
+    body('name').notEmpty().trim().withMessage('Service Patne Name is required'),
+    body('imageUrl').optional().trim(),
+    body('description').optional().trim(),
+    body('status').optional().isIn(['active', 'inactive']).withMessage('Status must be active or inactive'),
+];
+
 module.exports = {
     validate,
     mongoIdParam,
@@ -183,4 +199,7 @@ module.exports = {
     updateNotificationValidation,
     // Settings
     updateSettingValidation,
+    // service patner
+    createServicePatneValidation,
+    updateServicePatneValidation
 };

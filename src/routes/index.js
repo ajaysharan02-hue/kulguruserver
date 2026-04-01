@@ -14,6 +14,7 @@ router.use('/banners', require('./bannerRoutes'));
 router.use('/inquiries', require('./inquireRoutes'));
 router.use('/notifications', require('./notificationRoutes'));
 router.use('/programs', require('./programRoutes'));
+router.use('/servicepatners', require('./servicepatnerRoutes'));
 router.use('/roles', require('./roleRoutes'));
 router.use('/settings', require('./settingRoutes'));
 
