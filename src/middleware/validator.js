@@ -71,6 +71,7 @@ const createInquireValidation = [
     body('name').notEmpty().trim().withMessage('Name is required'),
     body('mobile').notEmpty().trim().withMessage('Mobile number is required'),
     body('program').isMongoId().withMessage('Valid program ID is required'),
+    body('course').optional({ values: 'falsy' }).isMongoId().withMessage('Valid course ID is required'),
     body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
 ];
 
@@ -79,6 +80,7 @@ const updateInquireValidation = [
     body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
     body('mobile').optional().trim().notEmpty().withMessage('Mobile cannot be empty'),
     body('program').optional().isMongoId().withMessage('Valid program ID is required'),
+    body('course').optional({ values: 'falsy' }).isMongoId().withMessage('Valid course ID is required'),
     body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
 ];
 
@@ -100,6 +102,32 @@ const updateProgramValidation = [
     body('code').optional().trim().toUpperCase(),
     body('description').optional().trim(),
     body('imageUrl').optional().trim().isURL().withMessage('Image URL must be a valid URL'),
+    body('duration').optional().trim(),
+    body('eligibility').optional().trim(),
+    body('fee').optional().isFloat({ min: 0 }).withMessage('Fee cannot be negative'),
+    body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
+];
+
+// ----- Course -----
+const createCourseValidation = [
+    body('program').isMongoId().withMessage('Valid program is required'),
+    body('name').notEmpty().trim().withMessage('Course name is required'),
+    body('code').optional().trim().toUpperCase(),
+    body('description').optional().trim(),
+    body('imageUrl').optional().trim(),
+    body('duration').optional().trim(),
+    body('eligibility').optional().trim(),
+    body('fee').optional().isFloat({ min: 0 }).withMessage('Fee cannot be negative'),
+    body('status').optional().isIn(['active', 'inactive']).withMessage('Invalid status'),
+];
+
+const updateCourseValidation = [
+    param('id').isMongoId().withMessage('Invalid course ID'),
+    body('program').optional().isMongoId().withMessage('Valid program is required'),
+    body('name').optional().trim().notEmpty().withMessage('Course name cannot be empty'),
+    body('code').optional().trim().toUpperCase(),
+    body('description').optional().trim(),
+    body('imageUrl').optional().trim(),
     body('duration').optional().trim(),
     body('eligibility').optional().trim(),
     body('fee').optional().isFloat({ min: 0 }).withMessage('Fee cannot be negative'),
@@ -189,6 +217,9 @@ module.exports = {
     // Program
     createProgramValidation,
     updateProgramValidation,
+    // Course
+    createCourseValidation,
+    updateCourseValidation,
     // Role
     createRoleValidation,
     updateRoleValidation,

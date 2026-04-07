@@ -22,6 +22,11 @@ const InquireSchema = new mongoose.Schema(
             ref: 'Program',
             required: [true, 'Program is required'],
         },
+        course: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Course',
+            default: null,
+        },
         status: {
             type: String,
             enum: ['active', 'inactive'],

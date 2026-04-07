@@ -28,9 +28,9 @@ app.use(
     })
 ); // Set security headers
 app.use(cookieParser()); // Parse cookies early
+const allowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [];
 app.use(cors({
     origin: (origin, callback) => {
-        const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:5173','http://localhost:3000','http://localhost:5177','https://kulguruadmin-production.up.railway.app','https://kulguruweb-production.up.railway.app'];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -92,7 +92,6 @@ const uploadsCandidates = [
 
 app.use('/uploads', cors({
     origin: (origin, callback) => {
-        const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:5173','http://localhost:3000','http://localhost:5177'];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -105,7 +104,11 @@ app.use('/uploads', cors({
 }), (req, res, next) => {
     let i = 0;
     const tryNext = () => {
-        if (i >= uploadsCandidates.length) return next();
+        if (i >= uploadsCandidates.length) {
+            // Do not pass missing static assets to API notFound/error middleware.
+            // Return a normal static 404 to avoid noisy stack traces in logs.
+            return res.status(404).end();
+        }
         const dir = uploadsCandidates[i++];
         return express.static(dir)(req, res, tryNext);
     };

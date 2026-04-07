@@ -32,6 +32,11 @@ if (!fs.existsSync(programsDir)) {
     fs.mkdirSync(programsDir, { recursive: true });
 }
 
+const coursesDir = path.join(uploadDir, 'courses');
+if (!fs.existsSync(coursesDir)) {
+    fs.mkdirSync(coursesDir, { recursive: true });
+}
+
 const servicepatnerDir = path.join(uploadDir, 'servicepatner');
 if (!fs.existsSync(servicepatnerDir)) {
     fs.mkdirSync(servicepatnerDir, { recursive: true });
@@ -44,6 +49,7 @@ const storage = multer.diskStorage({
         if (kind === 'logo' || kind === 'logos') return cb(null, logosDir);
         if (kind === 'avatar' || kind === 'avatars') return cb(null, avatarsDir);
         if (kind === 'program' || kind === 'programs') return cb(null, programsDir);
+        if (kind === 'course' || kind === 'courses') return cb(null, coursesDir);
         if (kind === 'servicepatner') return cb(null, servicepatnerDir);
         return cb(null, bannersDir);
     },

@@ -1,4 +1,5 @@
 const Inquire = require('../models/Inquire');
+const Course = require('../models/Course');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -32,6 +33,7 @@ exports.getInquires = asyncHandler(async (req, res, next) => {
     // Execute query
     const inquires = await Inquire.find(query)
         .populate('program', 'name code')
+        .populate('course', 'name code')
         .sort({ createdAt: -1 })
         .limit(limit * 1)
         .skip((page - 1) * limit)
@@ -64,7 +66,8 @@ exports.getInquires = asyncHandler(async (req, res, next) => {
  */
 exports.getInquire = asyncHandler(async (req, res, next) => {
     const inquire = await Inquire.findById(req.params.id)
-        .populate('program', 'name code');
+        .populate('program', 'name code')
+        .populate('course', 'name code');
 
     if (!inquire || inquire.deleted) {
         return next(new ErrorResponse('Inquiry not found', 404));
@@ -82,6 +85,18 @@ exports.getInquire = asyncHandler(async (req, res, next) => {
  * @access  Public
  */
 exports.createInquire = asyncHandler(async (req, res, next) => {
+    if (!req.body.program) {
+        return next(new ErrorResponse('Program is required', 400));
+    }
+    if (req.body.course) {
+        const course = await Course.findById(req.body.course);
+        if (!course || course.deleted) {
+            return next(new ErrorResponse('Course not found', 404));
+        }
+        if (String(course.program) !== String(req.body.program)) {
+            return next(new ErrorResponse('Selected course does not belong to selected program', 400));
+        }
+    }
     const inquire = await Inquire.create(req.body);
 
     res.status(201).json({
@@ -100,6 +115,18 @@ exports.updateInquire = asyncHandler(async (req, res, next) => {
 
     if (!inquire || inquire.deleted) {
         return next(new ErrorResponse('Inquiry not found', 404));
+    }
+
+    const nextProgram = req.body.program || inquire.program;
+    const nextCourse = req.body.course !== undefined ? req.body.course : inquire.course;
+    if (nextCourse) {
+        const course = await Course.findById(nextCourse);
+        if (!course || course.deleted) {
+            return next(new ErrorResponse('Course not found', 404));
+        }
+        if (String(course.program) !== String(nextProgram)) {
+            return next(new ErrorResponse('Selected course does not belong to selected program', 400));
+        }
     }
 
     inquire = await Inquire.findByIdAndUpdate(req.params.id, req.body, {
